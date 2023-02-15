@@ -9,6 +9,8 @@ import { auth } from "../firebase-config";
 import Error from "../shared/Error";
 import "./Auth.scss";
 import LoadSpinner from "../shared/LoadSpinner";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faG } from "@fortawesome/free-solid-svg-icons";
 
 export default function Signin() {
   // sign in component
@@ -29,7 +31,7 @@ export default function Signin() {
       setError({ message: error.message });
     }
 
-    setIsLoading(false)
+    setIsLoading(false);
   };
 
   const signInWithMicrosoft = async () => {
@@ -104,7 +106,7 @@ export default function Signin() {
   };
 
   return (
-    <div className="d-flex flex-column justify-content-center align-items-center min-vh-100">
+    <div className="d-flex flex-column justify-content-center align-items-center min-height">
       {/* <!--logo --> */}
       <div className="logo">Booklog</div>
       {/* <!-- errors --> */}
@@ -112,15 +114,38 @@ export default function Signin() {
       {/* <!-signin with gmail --> */}
       <div className="custom-width bg-white shadow-sm mb-2">
         <div className="d-grid">
-          <button className="btn" onClick={signInWithGoogle}>
-            {isLoading ? <LoadSpinner /> : "Log in with gmail"}
+          <button className="btn google" onClick={signInWithGoogle}>
+            {isLoading ? (
+              <LoadSpinner color="white" />
+            ) : (
+              <div className="d-flex justify-content-around align-items-center">
+                <FontAwesomeIcon icon={faG} /> Log in with Google
+              </div>
+            )}
           </button>
         </div>
       </div>
       {/* <!-- sign in with microsoft --> */}
       <div className="custom-width bg-white shadow-sm mb-2">
         <div className="d-grid">
-          <button className="btn">Log in with Microsoft</button>
+          <button className="btn">
+            {isLoading ? (
+              <LoadSpinner />
+            ) : (
+              <div className="d-flex justify-content-around align-items-center">
+                <span className="microsoft-logo">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 23 23">
+                  <path fill="#fff" d="M0 0h23v23H0z" />
+                  <path fill="#f35325" d="M1 1h10v10H1z" />
+                  <path fill="#81bc06" d="M12 1h10v10H12z" />
+                  <path fill="#05a6f0" d="M1 12h10v10H1z" />
+                  <path fill="#ffba08" d="M12 12h10v10H12z" />
+                </svg>
+                </span>
+                Log in with Microsoft
+              </div>
+            )}
+          </button>
         </div>
       </div>
       <div className="custom-width bg-white shadow-sm">

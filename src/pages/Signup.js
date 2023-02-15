@@ -9,6 +9,8 @@ import { auth } from "./../firebase-config";
 import Error from "./../shared/Error";
 import LoadSpinner from "./../shared/LoadSpinner";
 import "./Auth.scss";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faG } from "@fortawesome/free-solid-svg-icons";
 
 export default function Signup() {
   // sign up component
@@ -118,8 +120,14 @@ export default function Signup() {
       {/* <!--           signin with gmail --> */}
       <div className="custom-width bg-white shadow-sm mb-2">
         <div className="d-grid">
-          <button className="btn" onClick={signUpWithGoogle}>
-            Sign up with gmail
+          <button className="btn google" onClick={signUpWithGoogle}>
+          {isLoading ? (
+              <LoadSpinner color="white" />
+            ) : (
+              <div className="d-flex justify-content-around align-items-center">
+                <FontAwesomeIcon icon={faG} /> Sign up with Google
+              </div>
+            )}
           </button>
         </div>
       </div>
@@ -127,7 +135,22 @@ export default function Signup() {
       <div className="custom-width bg-white shadow-sm mb-2">
         <div className="d-grid">
           <button className="btn" onClick={signUpWithMicrosoft}>
-            Sign up with Microsoft
+          {isLoading ? (
+              <LoadSpinner />
+            ) : (
+              <div className="d-flex justify-content-around align-items-center">
+                <span className="microsoft-logo">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 23 23">
+                  <path fill="#fff" d="M0 0h23v23H0z" />
+                  <path fill="#f35325" d="M1 1h10v10H1z" />
+                  <path fill="#81bc06" d="M12 1h10v10H12z" />
+                  <path fill="#05a6f0" d="M1 12h10v10H1z" />
+                  <path fill="#ffba08" d="M12 12h10v10H12z" />
+                </svg>
+                </span>
+                Sign up with Microsoft
+              </div>
+            )}
           </button>
         </div>
       </div>

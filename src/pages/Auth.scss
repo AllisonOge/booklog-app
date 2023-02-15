@@ -1,14 +1,29 @@
 /* auth */
+$google: #db3236;
+// $microsoft: #db3236;
+
+.min-height {
+  min-height: 90vh;
+}
+
+.google {
+  background-color: $google;
+  color: #fff;
+}
+
+.microsoft-logo {
+  width: 15px;
+}
+
 .custom-width {
-    width: 350px;
-    max-width: 100%;
-  }
-   .logo {
-    padding: 20px 10px;
-  }
-  
-  .email {
-    padding: 20px 10px;
-    margin-top: 10px;
-  }
-  
+  width: 350px;
+  max-width: 100%;
+}
+.logo {
+  padding: 20px 10px;
+}
+
+.email {
+  padding: 20px 10px;
+  margin-top: 10px;
+}
