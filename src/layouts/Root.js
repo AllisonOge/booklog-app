@@ -7,9 +7,7 @@ export default function Root() {
       {/* navigation section */}
       <Navigation />
       {/* main section */}
-      <main>
-        <Outlet />
-      </main>
+      <Outlet />
       {/* footer section */}
       {/* <footer>footer section</footer> */}
     </div>
