@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { Navigate, NavLink } from "react-router-dom";
 import {
   createUserWithEmailAndPassword,
   signInWithPopup,
@@ -16,6 +16,7 @@ export default function Signup() {
   // sign up component
 
   const signUpWithGoogle = async () => {
+    const navigate = Navigate();
     // sign user up with Google provider
     try {
       const provider = new GoogleAuthProvider();
@@ -27,6 +28,7 @@ export default function Signup() {
       // get user
       const user = result.user;
       console.log(user);
+      navigate("/signin")
     } catch (error) {
       setError({ message: error.message });
     }
@@ -37,6 +39,7 @@ export default function Signup() {
   };
 
   const signUpWithEmailAndPassword = async (email, password) => {
+    const navigate = Navigate()
     try {
       const user = await createUserWithEmailAndPassword(auth, email, password);
       console.log(user);
@@ -47,7 +50,7 @@ export default function Signup() {
         confirmPassword: "",
         tncs: false,
       });
-      return user;
+      navigate("/signin")
     } catch (error) {
       setError({ message: error.message });
     }
