@@ -19,6 +19,7 @@ $google: #db3236;
   width: 350px;
   max-width: 100%;
 }
+
 .logo {
   padding: 20px 10px;
 }
@@ -26,4 +27,24 @@ $google: #db3236;
 .email {
   padding: 20px 10px;
   margin-top: 10px;
+}
+
+// 404 not found
+.vh-100-custom {
+  height: 100%;
+  min-height: 90vh;
+  width: 100%;
+
+  & > * {
+    height: inherit;
+    min-height: 90vh;
+    height: 90vh;
+  }
+
+  & svg {
+    flex-grow: 0;
+    height: inherit;
+    min-height: 90vh;
+    height: 90vh;
+  }
 }
