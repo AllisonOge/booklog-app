@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate, NavLink } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 import {
   createUserWithEmailAndPassword,
   signInWithPopup,
@@ -14,9 +14,9 @@ import { faG } from "@fortawesome/free-solid-svg-icons";
 
 export default function Signup() {
   // sign up component
+  const navigate = useNavigate();
 
   const signUpWithGoogle = async () => {
-    const navigate = Navigate();
     // sign user up with Google provider
     try {
       const provider = new GoogleAuthProvider();
@@ -28,10 +28,11 @@ export default function Signup() {
       // get user
       const user = result.user;
       console.log(user);
-      navigate("/signin")
     } catch (error) {
       setError({ message: error.message });
     }
+    setIsSubmitting(false);
+    navigate("/signin");
   };
 
   const signUpWithMicrosoft = async () => {
@@ -39,7 +40,6 @@ export default function Signup() {
   };
 
   const signUpWithEmailAndPassword = async (email, password) => {
-    const navigate = Navigate()
     try {
       const user = await createUserWithEmailAndPassword(auth, email, password);
       console.log(user);
@@ -50,10 +50,12 @@ export default function Signup() {
         confirmPassword: "",
         tncs: false,
       });
-      navigate("/signin")
     } catch (error) {
       setError({ message: error.message });
     }
+    setIsSubmitting(false);
+    navigate("/signin");
+    return;
   };
 
   const [formValues, setFormValues] = useState({
@@ -69,15 +71,13 @@ export default function Signup() {
 
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (Object.keys(formErrors).length == 0 && isSubmitted) {
       console.log("Creating a user...", formValues.email);
-      setIsLoading(true);
-      signUpWithEmailAndPassword(formValues.email, formValues.password).then(
-        () => setIsLoading(false)
-      );
+      setIsSubmitting(true);
+      signUpWithEmailAndPassword(formValues.email, formValues.password);
     }
     setIsSubmitted(false);
   }, [isSubmitted]);
@@ -93,18 +93,12 @@ export default function Signup() {
     setFormErrors(() => {
       // validate form
       const errors = {};
-      const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
       const passwordRegex =
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[_@])[a-zA-Z\d_@]{8,}$/;
-      if (!formValues.email) errors.email = "Email is required!";
-      else if (!emailRegex.test(formValues.email))
-        errors.email = "This is not a valid email";
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[_@])[a-zA-Z\d_@]{8,23}$/;
       if (!formValues.password) errors.password = "Password is required!";
       else if (!passwordRegex.test(formValues.password))
-        errors.password = "Password must satisfy all criteria";
-      if (!formValues.confirmPassword)
-        errors.confirmPassword = "Confirm Password is required!";
-      else if (formValues.confirmPassword !== formValues.password)
+        errors.password = "Password is invalid!";
+      if (formValues.confirmPassword !== formValues.password)
         errors.confirmPassword = "Password does not match";
       if (!formValues.tncs)
         errors.tncs = "You must agree to the Terms and Conditions";
@@ -117,32 +111,35 @@ export default function Signup() {
   return (
     <div className="d-flex flex-column justify-content-center align-items-center min-vh-100">
       {/* <!--       logo --> */}
-      <div className="logo">Booklog</div>
+      <div className="logo">
+        <img src="logo_icon.png" width={25} className="img-fluid" />
+      </div>
       {/* <!-- errors --> */}
       {error.message ? <Error message={error.message} /> : ""}
       {/* <!--           signin with gmail --> */}
       <div className="custom-width bg-white shadow-sm mb-2">
         <div className="d-grid">
-          <button className="btn google" onClick={signUpWithGoogle}>
-          {isLoading ? (
-              <LoadSpinner color="white" />
-            ) : (
-              <div className="d-flex justify-content-around align-items-center">
-                <FontAwesomeIcon icon={faG} /> Sign up with Google
-              </div>
-            )}
+          <button
+            className="btn google"
+            onClick={signUpWithGoogle}
+            disabled={isSubmitting}
+          >
+            <div className="d-flex justify-content-around align-items-center">
+              <FontAwesomeIcon icon={faG} /> Sign up with Google
+            </div>
           </button>
         </div>
       </div>
       {/* <!--             sign in with microsoft --> */}
       <div className="custom-width bg-white shadow-sm mb-2">
         <div className="d-grid">
-          <button className="btn" onClick={signUpWithMicrosoft}>
-          {isLoading ? (
-              <LoadSpinner />
-            ) : (
-              <div className="d-flex justify-content-around align-items-center">
-                <span className="microsoft-logo">
+          <button
+            className="btn"
+            onClick={signUpWithMicrosoft}
+            disabled={isSubmitting}
+          >
+            <div className="d-flex justify-content-around align-items-center">
+              <span className="microsoft-logo">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 23 23">
                   <path fill="#fff" d="M0 0h23v23H0z" />
                   <path fill="#f35325" d="M1 1h10v10H1z" />
@@ -150,10 +147,9 @@ export default function Signup() {
                   <path fill="#05a6f0" d="M1 12h10v10H1z" />
                   <path fill="#ffba08" d="M12 12h10v10H12z" />
                 </svg>
-                </span>
-                Sign up with Microsoft
-              </div>
-            )}
+              </span>
+              Sign up with Microsoft
+            </div>
           </button>
         </div>
       </div>
@@ -168,15 +164,15 @@ export default function Signup() {
                 </label>
               </small>
               <input
-                type="text"
-                className={
-                  formErrors?.email ? "form-control is-invalid" : "form-control"
-                }
+                type="email"
+                className="form-control"
                 name="email"
+                id="email"
+                required
                 value={formValues.email}
                 onChange={handleChange}
+                onFocus={() => setError({ message: "" })}
               />
-              <small className="invalid-feedback">{formErrors?.email}</small>
             </div>
             <div className="mt-1">
               <small>
@@ -192,12 +188,17 @@ export default function Signup() {
                     : "form-control"
                 }
                 name="password"
+                id="password"
+                required
+                minLength={8}
+                maxLength={23}
+                aria-invalid={formErrors?.password ? "true" : "false"}
+                aria-describedby="password-error"
                 value={formValues.password}
                 onChange={handleChange}
               />
-              <small className="invalid-feedback">{formErrors?.password}</small>
-              <small className="small text-muted">
-                Password should be
+              <small id="password-error" className="invalid-feedback">
+                {formErrors?.password}. It should be
                 <ul>
                   <li>at least 8 characters long</li>
                   <li>
@@ -221,6 +222,10 @@ export default function Signup() {
                     : "form-control"
                 }
                 name="confirmPassword"
+                id="confirmPassword"
+                required
+                aria-invalid={formErrors?.confirmPassword ? "true" : "false"}
+                aria-describedby="password-error"
                 value={formValues.confirmPassword}
                 onChange={handleChange}
               />
@@ -237,6 +242,7 @@ export default function Signup() {
                     : "form-check-input"
                 }
                 name="tncs"
+                id="tncs"
                 checked={formValues.tncs}
                 onChange={handleChange}
               />
@@ -251,8 +257,8 @@ export default function Signup() {
               <small className="invalid-feedback">{formErrors?.tncs}</small>
             </div>
             <div className="mt-2 d-grid">
-              <button className="btn btn-primary">
-                {isLoading ? <LoadSpinner color="white" /> : "Sign up"}
+              <button className="btn btn-primary" disabled={isSubmitting}>
+                {isSubmitting ? <LoadSpinner color="white" /> : "Sign up"}
               </button>
             </div>
           </form>

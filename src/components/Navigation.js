@@ -1,4 +1,4 @@
-import { Link, Navigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   faBook,
   faCartShopping,
@@ -10,6 +10,7 @@ import { auth } from "../firebase-config";
 
 const Navigation = () => {
   const [user, loading, error] = useAuthState(auth);
+  const navigate = useNavigate();
 
   const showStoreDropDown = () => {
     const bookStore = document.getElementById("bookstore");
@@ -42,31 +43,41 @@ const Navigation = () => {
     }
   };
 
-  // FIXME: use mouse enter and leave events
-  const handleClick2 = () => {
+  const showAccountDropDown = () => {
     const user = document.getElementById("user");
+    let classList = user.classList;
 
-    const classList1 = user.classList;
-    if (Array.from(classList1).filter((c) => c == "show").length == 0)
-      classList1.add("show");
-    else classList1.remove("show");
+    if (Array.from(classList).filter((c) => c == "show").length == 0)
+      classList.add("show");
 
-    const classList2 = user.nextElementSibling.classList;
-    if (Array.from(classList2).filter((c) => c == "show").length == 0) {
-      classList2.add("show");
+    classList = user.nextElementSibling.classList;
+    if (Array.from(classList).filter((c) => c == "show").length == 0) {
+      classList.add("show");
       user.nextElementSibling.setAttribute(
         "style",
         "position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(0px, 50px);"
       );
-    } else {
-      classList2.remove("show");
+    }
+  };
+
+  const removeAccountDropDown = () => {
+    const user = document.getElementById("user");
+    let classList = user.classList;
+
+    if (!(Array.from(classList).filter((c) => c == "show").length == 0)) {
+      classList.remove("show");
+    }
+
+    classList = user.nextElementSibling.classList;
+    if (!(Array.from(classList).filter((c) => c == "show").length == 0)) {
+      classList.remove("show");
       user.removeAttribute("style");
     }
   };
 
-  const signOut = () => {
-    user.signOut();
-    const navigate = Navigate();
+  const signOut = (event) => {
+    event.preventDefault();
+    auth.signOut();
     navigate("/signin");
   };
 
@@ -143,7 +154,8 @@ const Navigation = () => {
           {/* <!--       user account --> */}
           <button
             className="d-none d-md-block btn btn-dark dropdown py-0 me-2"
-            onMouseEnter={handleClick2}
+            onMouseEnter={showAccountDropDown}
+            onMouseLeave={removeAccountDropDown}
           >
             <Link
               id="user"
@@ -180,11 +192,15 @@ const Navigation = () => {
                   Library
                 </Link>
               </li>
-              <li className="dropdown-item">
-                <Link to="" className="nav-link" onClick={signOut}>
-                  Sign Out
-                </Link>
-              </li>
+              {user ? (
+                <li className="dropdown-item">
+                  <Link to="" className="nav-link" onClick={signOut}>
+                    Sign Out
+                  </Link>
+                </li>
+              ) : (
+                ""
+              )}
             </ul>
           </button>
           {/* <!--       orders --> */}

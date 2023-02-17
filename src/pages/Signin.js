@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 import {
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -14,9 +14,11 @@ import { faG } from "@fortawesome/free-solid-svg-icons";
 
 export default function Signin() {
   // sign in component
+  const navigate = useNavigate();
+
   const signInWithGoogle = async () => {
     // sign in with Google provider
-    setIsLoading(true);
+    setIsSubmitting(true);
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
@@ -30,8 +32,8 @@ export default function Signin() {
     } catch (error) {
       setError({ message: error.message });
     }
-
-    setIsLoading(false);
+    navigate("/");
+    setIsSubmitting(false);
   };
 
   const signInWithMicrosoft = async () => {
@@ -51,6 +53,7 @@ export default function Signin() {
     } catch (error) {
       setError({ message: error.message });
     }
+    navigate("/");
   };
 
   const [formValues, setFormValues] = useState({
@@ -58,13 +61,11 @@ export default function Signin() {
     password: "",
   });
 
-  const [formErrors, setFormErrors] = useState({});
-
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const [error, setError] = useState({ message: "" });
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -72,10 +73,10 @@ export default function Signin() {
   };
 
   useEffect(() => {
-    if (isSubmitted && Object.keys(formErrors).length === 0) {
-      setIsLoading(true);
+    if (isSubmitted) {
+      setIsSubmitting(true);
       logInWithEmailAndPassword(formValues.email, formValues.password).then(
-        () => setIsLoading(false)
+        () => setIsSubmitting(false)
       );
     }
     setIsSubmitted(false);
@@ -85,55 +86,42 @@ export default function Signin() {
   const handleSubmit = (event) => {
     // sign in with email and password
     event.preventDefault();
-    setFormErrors(() => {
-      // validate form
-      const errors = {};
-      const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
-      if (!formValues.email) errors.email = "Email is required!";
-      else if (!emailRegex.test(formValues.email))
-        errors.email = "This is not a valid email";
-      if (!formValues.password) errors.password = "Password is required!";
-
-      return errors;
-    });
-
     setIsSubmitted(true);
   };
 
-  const resetPassword = (event) => {
+  const resetPassword = () => {
     // reset the password
-    event.preventDefault();
+    console.log("resetting password!")
   };
 
   return (
     <div className="d-flex flex-column justify-content-center align-items-center min-height">
       {/* <!--logo --> */}
-      <div className="logo">Booklog</div>
+      <div className="logo">
+        <img src="logo_icon.png" width={25} className="img-fluid" />
+      </div>
       {/* <!-- errors --> */}
       {error.message ? <Error message={error.message} /> : ""}
       {/* <!-signin with gmail --> */}
       <div className="custom-width bg-white shadow-sm mb-2">
         <div className="d-grid">
-          <button className="btn google" onClick={signInWithGoogle}>
-            {isLoading ? (
-              <LoadSpinner color="white" />
-            ) : (
-              <div className="d-flex justify-content-around align-items-center">
-                <FontAwesomeIcon icon={faG} /> Log in with Google
-              </div>
-            )}
+          <button
+            className="btn google"
+            onClick={signInWithGoogle}
+            disabled={isSubmitting}
+          >
+            <div className="d-flex justify-content-around align-items-center">
+              <FontAwesomeIcon icon={faG} /> Log in with Google
+            </div>
           </button>
         </div>
       </div>
       {/* <!-- sign in with microsoft --> */}
       <div className="custom-width bg-white shadow-sm mb-2">
         <div className="d-grid">
-          <button className="btn">
-            {isLoading ? (
-              <LoadSpinner />
-            ) : (
-              <div className="d-flex justify-content-around align-items-center">
-                <span className="microsoft-logo">
+          <button className="btn" disabled={isSubmitting}>
+            <div className="d-flex justify-content-around align-items-center">
+              <span className="microsoft-logo">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 23 23">
                   <path fill="#fff" d="M0 0h23v23H0z" />
                   <path fill="#f35325" d="M1 1h10v10H1z" />
@@ -141,10 +129,9 @@ export default function Signin() {
                   <path fill="#05a6f0" d="M1 12h10v10H1z" />
                   <path fill="#ffba08" d="M12 12h10v10H12z" />
                 </svg>
-                </span>
-                Log in with Microsoft
-              </div>
-            )}
+              </span>
+              Log in with Microsoft
+            </div>
           </button>
         </div>
       </div>
@@ -159,15 +146,15 @@ export default function Signin() {
                 </label>
               </small>
               <input
-                type="text"
-                className={
-                  formErrors?.email ? "form-control is-invalid" : "form-control"
-                }
+                type="email"
+                className="form-control"
                 name="email"
+                id="email"
+                required
                 value={formValues.email}
                 onChange={handleChange}
+                onFocus={() => setError({ message: "" })}
               />
-              <small className="invalid-feedback">{formErrors?.email}</small>
             </div>
             <div className="mt-1">
               <div className="d-flex justify-content-between">
@@ -184,20 +171,18 @@ export default function Signin() {
               </div>
               <input
                 type="password"
-                className={
-                  formErrors?.password
-                    ? "form-control is-invalid"
-                    : "form-control"
-                }
+                className="form-control"
                 name="password"
+                id="password"
+                required
                 value={formValues.password}
                 onChange={handleChange}
+                onFocus={() => setError({ message: "" })}
               />
-              <small className="invalid-feedback">{formErrors?.password}</small>
             </div>
             <div className="mt-2 d-grid">
-              <button className="btn btn-primary">
-                {isLoading ? <LoadSpinner color="white" /> : "Log in"}
+              <button className="btn btn-primary" disabled={isSubmitting}>
+                {isSubmitting ? <LoadSpinner color="white" /> : "Log in"}
               </button>
             </div>
           </form>
