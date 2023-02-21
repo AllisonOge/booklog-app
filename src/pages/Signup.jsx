@@ -5,9 +5,9 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
 } from "firebase/auth";
-import { auth } from "./../firebase-config";
-import Error from "./../shared/Error";
-import LoadSpinner from "./../shared/LoadSpinner";
+import { auth } from "../firebase-config";
+import Error from "../shared/Error";
+import LoadSpinner from "../shared/LoadSpinner";
 import "./Auth.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faG } from "@fortawesome/free-solid-svg-icons";
